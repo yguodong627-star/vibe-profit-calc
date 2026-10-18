@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>利润定价计算器 · Profit &amp; Price Calculator</title>
+<meta name="description" content="给小卖家用的利润与定价计算器：Etsy、亚马逊、Shopify、eBay、淘宝、小红书费率模板，盈亏平衡价与目标利润率反推售价。纯前端，数据只存在你的浏览器。">
+<meta name="theme-color" content="#f3f1ec">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231d2327'/%3E%3Cpath d='M8 22l6-7 4 4 6-9' stroke='%23e8a33d' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-in">
+    <div class="brand">
+      <span class="mark" aria-hidden="true"><svg viewBox="0 0 32 32" width="26" height="26"><rect width="32" height="32" rx="7" fill="#1d2327"/><path d="M8 22l6-7 4 4 6-9" stroke="#e8a33d" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <div><b data-i18n="title">利润定价计算器</b><small data-i18n="sub">小卖家工具箱 · 01</small></div>
+    </div>
+    <nav class="tabs" id="tabs" role="tablist">
+      <button role="tab" data-tab="calc" class="on" data-i18n="tabCalc">计算</button>
+      <button role="tab" data-tab="compare" data-i18n="tabCompare">情景对比</button>
+      <button role="tab" data-tab="batch" data-i18n="tabBatch">批量 <i class="pro-tag">Pro</i></button>
+      <button role="tab" data-tab="rates" data-i18n="tabRates">费率与汇率</button>
+    </nav>
+    <div class="top-r">
+      <button class="chip" id="langBtn" title="中文 / English">EN</button>
+      <button class="chip pro-btn" id="proBtn"><span data-i18n="proBtn">Pro 解锁</span></button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+<!-- ============ 计算 ============ -->
+<section id="tab-calc" class="pane on">
+  <div class="grid">
+    <div class="col-in">
+      <div class="card">
+        <h2 data-i18n="hTpl">1 · 平台模板</h2>
+        <div class="row">
+          <select id="tpl" aria-label="template"></select>
+        </div>
+        <div id="tplInfo" class="tpl-info"></div>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="hPrice">2 · 售价与成本</h2>
+        <div class="fields" id="f-basic"></div>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="hFee">3 · 平台费用</h2>
+        <div class="fields" id="f-fee"></div>
+        <details class="adv"><summary data-i18n="advSum">高级：小额订单固定费</summary>
+          <div class="fields" id="f-adv"></div>
+        </details>
+        <div class="row gap">
+          <button class="btn sm" id="saveTpl" data-i18n="saveTpl">存为我的模板</button>
+          <button class="btn sm ghost" id="delTpl" data-i18n="delTpl">删除当前模板</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="hAd">4 · 广告与退货</h2>
+        <div class="fields" id="f-ad"></div>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="hTarget">5 · 目标利润率</h2>
+        <div class="fields" id="f-target"></div>
+      </div>
+    </div>
+
+    <aside class="col-out" id="result">
+      <div class="card res">
+        <div class="res-head">
+          <span class="lab" data-i18n="rProfit">每件利润</span>
+          <span class="badge" id="rBadge"></span>
+        </div>
+        <div class="big" id="rProfit">—</div>
+        <div class="sub" id="rProfitCny"></div>
+        <div class="kpis">
+          <div><span class="lab" data-i18n="rMargin">利润率</span><b id="rMargin">—</b></div>
+          <div><span class="lab" data-i18n="rBE">盈亏平衡价</span><b id="rBE">—</b></div>
+          <div><span class="lab" data-i18n="rFees">平台费合计</span><b id="rFees">—</b></div>
+        </div>
+        <div class="target" id="rTarget"></div>
+        <div id="rWarn"></div>
+        <div class="bar" id="rBar" aria-hidden="true"></div>
+        <div class="legend" id="rLegend"></div>
+        <table class="bd" id="rTable"></table>
+        <div class="row gap">
+          <button class="btn" id="saveSc" data-i18n="saveSc">保存为情景</button>
+          <button class="btn ghost" id="applyTarget" data-i18n="applyTarget">采用建议售价</button>
+        </div>
+      </div>
+      <p class="disc" data-i18n="disc">免责声明：平台费率、汇率与规则会变化，本工具的预设仅供参考，结果为估算，不构成财务、税务建议。定价前请以平台后台和自己的账单为准。</p>
+    </aside>
+  </div>
+</section>
+
+<!-- ============ 对比 ============ -->
+<section id="tab-compare" class="pane">
+  <div class="card">
+    <div class="card-h"><h2 data-i18n="hScen">已保存的情景</h2><span class="muted" id="scCount"></span></div>
+    <div id="scList"></div>
+  </div>
+  <div class="card">
+    <h2 data-i18n="hCmp">对比</h2>
+    <div class="tbl-wrap" id="cmpWrap"></div>
+  </div>
+</section>
+
+<!-- ============ 批量 ============ -->
+<section id="tab-batch" class="pane">
+  <div class="card" id="batchCard">
+    <div class="card-h"><h2 data-i18n="hBatch">CSV 批量算利润</h2><span class="pro-tag big">Pro</span></div>
+    <p class="muted" data-i18n="batchDesc">按“计算”页当前选中的平台模板与费用设置，对每一行商品算利润。CSV 里没写的列用当前设置。</p>
+    <div class="lock" id="batchLock"><span data-i18n="batchLocked">批量导入与导出是 Pro 功能。</span> <button class="btn sm" data-open-pro data-i18n="proBtn">Pro 解锁</button></div>
+    <div class="row gap wrap-r">
+      <button class="btn sm ghost" id="dlSample" data-i18n="dlSample">下载示例 CSV</button>
+      <label class="btn sm" for="csvFile" data-i18n="pickCsv">选择 CSV 文件</label>
+      <input type="file" id="csvFile" accept=".csv,text/csv,text/plain" hidden>
+      <button class="btn sm" id="runPaste" data-i18n="runPaste">计算粘贴内容</button>
+      <button class="btn sm ghost" id="expCsv" data-i18n="expCsv">导出结果 CSV</button>
+    </div>
+    <textarea id="csvText" rows="5" spellcheck="false" placeholder="name,price,ship_income,cost,ship_cost,other_cost,ad_pct,return_rate&#10;马克杯,24,0,6.5,4,0.8,8,3"></textarea>
+    <p class="muted small" data-i18n="batchCols">列：name 名称, price 售价, ship_income 收取运费, cost 成本, ship_cost 实际运费, other_cost 其他成本, ad_pct 广告%, return_rate 退货率%。也认中文表头。</p>
+    <div class="tbl-wrap" id="batchOut"></div>
+  </div>
+</section>
+
+<!-- ============ 费率 ============ -->
+<section id="tab-rates" class="pane">
+  <div class="card">
+    <h2 data-i18n="hFx">汇率（手动填写）</h2>
+    <p class="muted" data-i18n="fxDesc">没有内置汇率，避免过期数据误导你。填“1 单位该货币 = 多少人民币”，成本币种与售价币种不同时才会用到。</p>
+    <div class="fields fx" id="fxGrid"></div>
+  </div>
+  <div class="card">
+    <h2 data-i18n="hSrc">费率更新日期与来源</h2>
+    <p class="muted" data-i18n="srcDesc">下表为内置预设。“已核对”指在核对日读取了平台官方页面内容；“部分核对”指官方页面没能直接打开或含第三方转述；“请自行核对”表示没有拿到可靠来源，预设值不可直接使用。</p>
+    <div class="tbl-wrap" id="srcTable"></div>
+  </div>
+</section>
+</main>
+
+<div class="mbar" id="mbar"><div><span class="lab" data-i18n="rProfit">每件利润</span><b id="mProfit">—</b></div><div><span class="lab" data-i18n="rMargin">利润率</span><b id="mMargin">—</b></div><button class="btn sm" id="mGo" data-i18n="detail">明细</button></div>
+
+<footer class="wrap foot">
+  <span data-i18n="foot">数据只保存在本浏览器（localStorage），不上传。清除浏览器数据会丢失。</span>
+  <span class="muted small">v1.0 · 2026-10-18</span>
+</footer>
+
+<!-- Pro dialog -->
+<dialog id="proDlg">
+  <form method="dialog" class="dlg">
+    <h3 data-i18n="proTitle">Pro 解锁</h3>
+    <ul class="pro-list">
+      <li data-i18n="pro1">CSV 批量导入多个商品，一次算完并导出结果</li>
+      <li data-i18n="pro2">保存多个自定义费率模板（免费版 1 个）</li>
+      <li data-i18n="pro3">情景保存上限 200 个，对比最多 8 个（免费 10 个 / 3 个）</li>
+    </ul>
+    <p class="muted small" data-i18n="proFree">免费版的计算、模板、情景保存与对比都是完整可用的。</p>
+    <label class="lab" for="licIn" data-i18n="licLabel">授权码</label>
+    <input id="licIn" type="text" placeholder="PC1-XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false">
+    <div id="licMsg" class="licmsg"></div>
+    <p class="muted small" data-i18n="licNote">当前只做本地格式校验，是占位实现，尚未接入收款与发码；校验可被绕过，不具备防盗版能力。</p>
+    <div class="row gap">
+      <button class="btn" id="licOk" value="x" type="button" data-i18n="licApply">验证并解锁</button>
+      <button class="btn ghost" id="licClear" type="button" data-i18n="licClear">清除授权</button>
+      <button class="btn ghost" id="licBuy" type="button" disabled data-i18n="licBuy">获取授权（收款未开通）</button>
+      <button class="btn ghost" value="close" data-i18n="close">关闭</button>
+    </div>
+  </form>
+</dialog>
+<div id="toast" class="toast" role="status"></div>
+<script src="app.js"></script>
+</body>
+</html>
