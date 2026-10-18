@@ -46,7 +46,6 @@ const near = (a, b, m, e = 1e-9) => ok(Math.abs(a - b) < e, `${m}: got ${a}, wan
     // 高成本下盈亏平衡价应使利润≈0
     const hi = base({ cost: 500, adPct: 10, retRate: 5, retShip: 2 });
     const bp = PC.solve(hi, 1, 0); out.hiBE = { bp, profit: PC.calc(hi, bp, 1).profit, below: PC.calc(hi, bp - 0.01, 1).profit };
-    out.lic = { good: PC.licValid('PC1-ABCD-EFGH-' + PC.licSum('ABCD', 'EFGH')), bad: PC.licValid('PC1-ABCD-EFGH-ZZZZ'), junk: PC.licValid('hello') };
     out.csv = PC.parseCSV('\ufeffname,price\r\n"a,b",10\r\n"he said ""hi""",5\r\n');
     return out;
   });
@@ -62,7 +61,6 @@ const near = (a, b, m, e = 1e-9) => ok(Math.abs(a - b) < e, `${m}: got ${a}, wan
   ok(core.zero.margin == null || Number.isNaN(core.zero.margin), '零收入利润率 NaN 不崩'); ok(core.tgt100 === null, '目标 100% 无解');
   core.chk.forEach(x => ok(x.okAt && x.notBelow, `目标 ${x.m} 反推价 ${x.P} 最小且达标`));
   near(core.hiBE.profit, 0, '盈亏平衡价利润≈0', 0.02); ok(core.hiBE.below < 0, '平衡价少一分就亏');
-  ok(core.lic.good && !core.lic.bad && !core.lic.junk, '授权码校验');
   ok(core.csv.length === 3 && core.csv[1][0] === 'a,b' && core.csv[2][0] === 'he said "hi"', 'CSV 引号解析');
 
   /* ---------- B. 全部模板：载入后数值有限、已核对模板有来源 ---------- */
@@ -97,49 +95,40 @@ const near = (a, b, m, e = 1e-9) => ok(Math.abs(a - b) < e, `${m}: got ${a}, wan
   await page.$eval('[data-fx=USD]', el => { el.value = '7'; el.dispatchEvent(new Event('input', { bubbles: true })); });
   await page.click('[data-tab=calc]');
   ok(!(await txt('#rWarn')).includes('汇率'), '填汇率后警告消失');
-  // 情景：保存 + 免费上限 10 + 对比上限 3
+  // 情景：无限额（保存 12 个）、对比可同时勾选 5 个
   await page.click('[data-tab=calc]');
-  for (let i = 0; i < 11; i++) { await setVal('price', String(20 + i)); await page.click('#saveSc'); }
-  ok(await page.$eval('#proDlg', d => d.open), '超限弹出 Pro 提示'); await page.keyboard.press('Escape');
+  for (let i = 0; i < 12; i++) { await setVal('price', String(20 + i)); await page.click('#saveSc'); }
+  ok(!(await page.$('dialog')), '页面没有任何弹窗/解锁入口');
   let n = await page.evaluate(() => PC.store().scenarios.length);
-  ok(n === 10, '免费版情景上限 10，实际 ' + n);
+  ok(n === 12, '情景保存无上限，实际 ' + n);
   await page.click('[data-tab=compare]');
-  for (let i = 0; i < 4; i++) { await page.evaluate((i) => document.querySelectorAll('[data-sc]')[i].click(), i); }
-  ok((await page.$$('[data-sc]:checked')).length === 3, '免费对比最多 3 个');
-  ok((await page.$$('.cmp thead th')).length === 4, '对比表 3 列 + 表头');
-  // 自定义模板：免费 1 个
+  for (let i = 0; i < 5; i++) { await page.evaluate((i) => document.querySelectorAll('[data-sc]')[i].click(), i); }
+  ok((await page.$$('[data-sc]:checked')).length === 5, '对比可同时勾选 5 个');
+  ok((await page.$$('.cmp thead th')).length === 6, '对比表 5 列 + 表头');
+  // 自定义模板：不限个数
   await page.click('[data-tab=calc]');
-  await page.click('#saveTpl'); await page.click('#saveTpl'); await page.keyboard.press('Escape');
-  ok((await page.evaluate(() => PC.store().myTpls.length)) === 1, '免费只能存 1 个自定义模板');
-  // 批量：免费被拦
+  await page.click('#saveTpl'); await page.click('#saveTpl'); await page.click('#saveTpl');
+  ok((await page.evaluate(() => PC.store().myTpls.length)) === 3, '可存多个自定义模板');
+  // 批量：直接可用
   await page.click('[data-tab=batch]');
+  ok(!(await page.$('#batchLock')), '批量页无锁定提示');
   await page.$eval('#csvText', el => el.value = 'name,price,cost\nA,30,5');
   await page.click('#runPaste');
-  ok(await page.$eval('#proDlg', d => d.open), '免费用户批量触发 Pro 弹窗');
-  await page.keyboard.press('Escape');
-  // 用占位校验算出的测试码解锁
-  const key = await page.evaluate(() => 'PC1-TEST-KEYS-' + PC.licSum('TEST', 'KEYS'));
-  await page.click('#proBtn');
-  await page.type('#licIn', 'PC1-TEST-KEYS-AAAA'); await page.click('#licOk');
-  ok(!(await page.evaluate(() => PC.licValid(PC.store().license))), '错误授权码不解锁');
-  await page.$eval('#licIn', el => el.value = ''); await page.type('#licIn', key); await page.click('#licOk');
-  ok((await txt('#proBtn')).includes('已解锁'), 'Pro 解锁后按钮状态: ' + await txt('#proBtn'));
-  await page.keyboard.press('Escape');
-  await page.click('#runPaste');
-  ok((await page.$$('#batchOut tbody tr')).length === 1, '批量计算 1 行');
+  ok((await page.$$('#batchOut tbody tr')).length === 1, '批量计算 1 行（无需解锁）');
   await page.$eval('#csvText', el => el.value = '名称,售价,成本,退货率\n=HYPERLINK("x"),30,5,10\n杯子,50,10,0\n坏行,abc,,');
   await page.click('#runPaste');
   ok((await page.$$('#batchOut tbody tr')).length === 3, '批量中文表头 3 行（含坏行不崩）');
-  // Pro 可存多模板、情景超过 10
-  await page.click('[data-tab=calc]');
-  await page.click('#saveTpl');
-  ok((await page.evaluate(() => PC.store().myTpls.length)) === 2, 'Pro 可存多个模板');
-  await page.click('#saveSc');
-  ok((await page.evaluate(() => PC.store().scenarios.length)) === 11, 'Pro 情景可超过 10');
+  const big = Array.from({ length: 300 }, (_, i) => 'S' + i + ',' + (10 + i) + ',5').join('\n');
+  await page.$eval('#csvText', (el, b) => el.value = 'name,price,cost\n' + b, big);
+  await page.click('#runPaste');
+  ok((await page.$$('#batchOut tbody tr')).length === 300, '批量 300 行无限制');
+  // 页面无付费相关文案
+  const body = await page.evaluate(() => document.body.innerText + document.documentElement.outerHTML);
+  ok(!/Pro\b|授权码|付费|收费|解锁/.test(body), '页面不含 Pro/授权/付费字样');
   // 持久化：刷新后仍在
   await page.reload({ waitUntil: 'networkidle0' });
-  const st = await page.evaluate(() => ({ sc: PC.store().scenarios.length, pro: PC.licValid(PC.store().license), rate: PC.store().rates.USD, price: PC.store().state.price }));
-  ok(st.sc === 11 && st.pro && st.rate === 7, '刷新后情景/授权/汇率保留 ' + JSON.stringify(st));
+  const st = await page.evaluate(() => ({ sc: PC.store().scenarios.length, rate: PC.store().rates.USD, price: PC.store().state.price }));
+  ok(st.sc === 12 && st.rate === 7, '刷新后情景/汇率保留 ' + JSON.stringify(st));
   // 语言切换
   await page.click('#langBtn');
   ok((await txt('.brand b')) === 'Profit & Price Calculator', '切英文');

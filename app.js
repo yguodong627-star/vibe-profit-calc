@@ -5,7 +5,6 @@
 /* ---------------- 常量与模板 ---------------- */
 var CURS = ['CNY', 'USD', 'EUR', 'GBP', 'HKD', 'JPY', 'CAD', 'AUD', 'SGD'];
 var DATE = '2026-10-18';
-var LIM = { free: { sc: 10, cmp: 3, tpl: 1 }, pro: { sc: 200, cmp: 8, tpl: 1e9 } };
 
 var Z = function (zh, en) { return { zh: zh, en: en }; };
 // status: ok 已核对 | part 部分核对 | none 请自行核对
@@ -49,7 +48,7 @@ var TPLS = [
     src: [['Shopify Pricing', 'https://www.shopify.com/pricing']] },
   { id: 'ebay-us', g: 'eBay', name: Z('eBay 美国 · 多数类目（无店铺订阅）', 'eBay US · most categories (no store)'), cur: 'USD', status: 'part',
     f: { commPct: 13.6, commOnShip: 1, commFixed: 0.4, commMin: 0, payPct: 0, payFixed: 0, listing: 0, retFeeKeep: 0, lowThr: 10, commFixedLow: 0.3 },
-    note: Z('成交价值费 13.6%（基数含运费与销售税，这里没算税）+ 每单 $0.40（总额 ≤ $10 为 $0.30）。支付费已含在内。书籍影音 15.3%、珠宝手袋 15% 等其他类目、店铺订阅折扣、7500 美元以上部分 2.35%、广告费均未内置。eBay 官方页面我这边打不开（被拦截），数据来自引用该页面的第三方并与另一来源互相印证，所以只标“部分核对”。',
+    note: Z('成交价值费 13.6%（基数含运费与销售税，这里没算税）+ 每单 $0.40（总额 ≤ $10 为 $0.30）。支付手续费已含在内。书籍影音 15.3%、珠宝手袋 15% 等其他类目、店铺订阅折扣、7500 美元以上部分 2.35%、广告费均未内置。eBay 官方页面我这边打不开（被拦截），数据来自引用该页面的第三方并与另一来源互相印证，所以只标“部分核对”。',
       'Final value fee 13.6% (base includes shipping and sales tax; tax not modelled) + $0.40 per order ($0.30 if total ≤ $10). Payment fees included. Other categories (books/media 15.3%, jewelry/handbags 15%…), store discounts, the 2.35% tier above $7,500 and ad fees are not built in. eBay\'s own page blocked my fetch; numbers come from third parties citing it, so only "partly verified".'),
     src: [['eBay: Selling fees', 'https://www.ebay.com/help/selling/fees-credits-invoices/selling-fees?id=4822'], ['第三方：sellmath eBay FVF', 'https://sellmath.com/en/guide/ebay-final-value-fees-by-category']] },
   { id: 'taobao', g: 'CN', name: Z('淘宝（非天猫）· 基础软件服务费', 'Taobao (non-Tmall) · base software fee'), cur: 'CNY', status: 'part',
@@ -64,7 +63,7 @@ var TPLS = [
     src: [['小红书招商官网：开店材料及费用', 'https://zhaoshang.xiaohongshu.com/merchant/materials-and-cost']] },
   { id: 'custom', g: 'Custom', name: Z('自定义（全部归零）', 'Custom (all zero)'), cur: 'CNY', status: 'none',
     f: { commPct: 0, commOnShip: 1, commFixed: 0, commMin: 0, payPct: 0, payFixed: 0, listing: 0, retFeeKeep: 0 },
-    note: Z('适合京东、拼多多、抖音、Shopee、Temu 或任何自己知道费率的渠道：手填佣金、支付费即可。', 'For any channel whose rates you know: fill commission and payment fee yourself.'),
+    note: Z('适合京东、拼多多、抖音、Shopee、Temu 或任何自己知道费率的渠道：手填佣金、支付手续费即可。', 'For any channel whose rates you know: fill commission and payment fee yourself.'),
     src: [] }
 ];
 var GROUPS = { Etsy: 'Etsy', Amazon: Z('亚马逊', 'Amazon'), Shopify: 'Shopify', eBay: 'eBay', CN: Z('国内平台', 'China platforms'), Custom: Z('其他', 'Other') };
@@ -72,27 +71,21 @@ var GROUPS = { Etsy: 'Etsy', Amazon: Z('亚马逊', 'Amazon'), Shopify: 'Shopify
 /* ---------------- 文案 ---------------- */
 var I18N = {
   zh: {
-    title: '利润定价计算器', sub: '小卖家工具箱 · 01', tabCalc: '计算', tabCompare: '情景对比', tabBatch: '批量 <i class="pro-tag">Pro</i>', tabRates: '费率与汇率',
-    proBtn: 'Pro 解锁', proOn: 'Pro 已解锁',
+    title: '利润定价计算器', sub: '小卖家工具箱 · 01', tabCalc: '计算', tabCompare: '情景对比', tabBatch: '批量', tabRates: '费率与汇率',
     hTpl: '1 · 平台模板', hPrice: '2 · 售价与成本', hFee: '3 · 平台费用', hAd: '4 · 广告与退货', hTarget: '5 · 目标利润率',
     advSum: '高级：小额订单固定费', saveTpl: '存为我的模板', delTpl: '删除当前模板',
     rProfit: '每件利润', rMargin: '利润率', rBE: '盈亏平衡价', rFees: '平台费合计', saveSc: '保存为情景', applyTarget: '采用建议售价', detail: '明细',
     disc: '免责声明：平台费率、汇率与规则会变化，本工具的预设仅供参考，结果为估算，不构成财务、税务建议。定价前请以平台后台和自己的账单为准。',
     hScen: '已保存的情景', hCmp: '对比', hBatch: 'CSV 批量算利润',
     batchDesc: '按“计算”页当前选中的平台模板与费用设置，对每一行商品算利润。CSV 里没写的列用当前设置。',
-    batchLocked: '批量导入与导出是 Pro 功能。', dlSample: '下载示例 CSV', pickCsv: '选择 CSV 文件', runPaste: '计算粘贴内容', expCsv: '导出结果 CSV',
+    dlSample: '下载示例 CSV', pickCsv: '选择 CSV 文件', runPaste: '计算粘贴内容', expCsv: '导出结果 CSV',
     batchCols: '列：name 名称, price 售价, ship_income 收取运费, cost 成本, ship_cost 实际运费, other_cost 其他成本, ad_pct 广告%, return_rate 退货率%。也认中文表头。',
     hFx: '汇率（手动填写）', fxDesc: '没有内置汇率，避免过期数据误导你。填“1 单位该货币 = 多少人民币”，成本币种与售价币种不同时才会用到。',
     hSrc: '费率更新日期与来源', srcDesc: '下表为内置预设。“已核对”指在核对日读取了平台官方页面内容；“部分核对”指官方页面没能直接打开或含第三方转述；“请自行核对”表示没有拿到可靠来源，预设值不可直接使用。',
-    foot: '数据只保存在本浏览器（localStorage），不上传。清除浏览器数据会丢失。',
-    proTitle: 'Pro 解锁', pro1: 'CSV 批量导入多个商品，一次算完并导出结果', pro2: '保存多个自定义费率模板（免费版 1 个）', pro3: '情景保存上限 200 个，对比最多 8 个（免费 10 个 / 3 个）',
-    proFree: '免费版的计算、模板、情景保存与对比都是完整可用的。', licLabel: '授权码',
-    licNote: '当前只做本地格式校验，是占位实现，尚未接入收款与发码；校验可被绕过，不具备防盗版能力。',
-    licApply: '验证并解锁', licClear: '清除授权', licBuy: '获取授权（收款未开通）', close: '关闭',
-    licOK: '授权码有效，Pro 已在本机解锁。', licBad: '授权码无效，请检查格式。', licCleared: '已清除授权。',
+    foot: '完全免费，没有任何限额。数据只保存在本浏览器（localStorage），不上传。清除浏览器数据会丢失。',
     st_ok: '已核对', st_part: '部分核对', st_none: '请自行核对', checked: '核对日', src: '来源', modified: '（已修改）', myTpl: '我的模板',
     L_sellCur: '售价币种', L_costCur: '成本币种', L_price: '商品售价', L_shipIncome: '向买家收取的运费', L_cost: '进货/生产成本', L_shipCost: '实际发货运费 / 配送费', L_otherCost: '其他成本（包装、人工…）',
-    L_commPct: '平台佣金 %', L_commOnShip: '佣金基数含运费', L_commFixed: '每单固定佣金', L_commMin: '佣金最低收费', L_payPct: '支付手续费 %', L_payFixed: '每单支付固定费', L_listing: '刊登费（每件摊）',
+    L_commPct: '平台佣金 %', L_commOnShip: '佣金基数含运费', L_commFixed: '每单固定佣金', L_commMin: '佣金最低额', L_payPct: '支付手续费 %', L_payFixed: '每单支付固定费', L_listing: '刊登费（每件摊）',
     L_lowThr: '小额订单阈值（总额 ≤）', L_commFixedLow: '小额订单固定费',
     L_adPct: '广告费占售价 %', L_adFixed: '每单广告费', L_retRate: '退货率 %', L_retShip: '每次退货的退回运费', L_retResale: '退回后可再售比例 %', L_retFeeKeep: '退货时平台费不退还比例 %',
     L_targetMargin: '目标利润率 %',
@@ -108,34 +101,28 @@ var I18N = {
     wRate: function (a, b) { return '缺少汇率：请在“费率与汇率”里填 ' + a + (b ? ' 和 ' + b : '') + ' 对人民币的汇率，成本无法折算。'; },
     wLoss: '按当前设置每件亏损。', wFeeHigh: '各项比例合计 ≥ 100%，价格再高也无法盈利。',
     cnyLine: function (v) { return '折合 ' + v; },
-    scName: '给这个情景起个名字', scDefault: '情景', scSaved: '已保存情景', scLimit: function (n) { return '免费版最多保存 ' + n + ' 个情景，可删除旧的或解锁 Pro。'; },
+    scName: '给这个情景起个名字', scDefault: '情景', scSaved: '已保存情景',
     scEmpty: '还没有保存的情景。在“计算”页点“保存为情景”。', scLoad: '载入', scDel: '删除', scSel: '对比',
-    cmpEmpty: '勾选 2 个以上情景进行对比。', cmpMax: function (n) { return '当前最多对比 ' + n + ' 个。'; },
+    cmpEmpty: '勾选 2 个以上情景进行对比。',
     cRows: ['平台模板', '售价币种', '商品售价', '每件利润', '利润率', '盈亏平衡价', '平台费合计', '成本（折算）'], cBest: '利润率最高',
-    tplName: '给模板起个名字', tplSaved: '已保存模板', tplLimit: '免费版只能保存 1 个自定义模板，覆盖请先删除旧的，或解锁 Pro。', tplDeleted: '已删除', tplNoDel: '内置模板不能删除。', tplEx: '内置模板',
-    proNeed: '这是 Pro 功能。', csvEmpty: '没有可计算的行。', csvDone: function (n) { return '已计算 ' + n + ' 行'; }, csvCols: ['名称', '售价', '收取运费', '成本', '实际运费', '其他成本', '广告%', '退货率%', '平台费', '每件利润', '利润率', '盈亏平衡价', '建议售价'],
+    tplName: '给模板起个名字', tplSaved: '已保存模板', tplDeleted: '已删除', tplNoDel: '内置模板不能删除。', tplEx: '内置模板',
+    csvEmpty: '没有可计算的行。', csvDone: function (n) { return '已计算 ' + n + ' 行'; }, csvCols: ['名称', '售价', '收取运费', '成本', '实际运费', '其他成本', '广告%', '退货率%', '平台费', '每件利润', '利润率', '盈亏平衡价', '建议售价'],
     fxRow: function (c) { return '1 ' + c + ' ='; }, fxUnit: 'CNY', fxFixed: '基准',
     sTplCols: ['模板', '状态', '核对日', '来源与备注'], unreach: '无法达到'
   },
   en: {
-    title: 'Profit & Price Calculator', sub: 'Seller toolbox · 01', tabCalc: 'Calculator', tabCompare: 'Compare', tabBatch: 'Batch <i class="pro-tag">Pro</i>', tabRates: 'Rates & FX',
-    proBtn: 'Unlock Pro', proOn: 'Pro unlocked',
+    title: 'Profit & Price Calculator', sub: 'Seller toolbox · 01', tabCalc: 'Calculator', tabCompare: 'Compare', tabBatch: 'Batch', tabRates: 'Rates & FX',
     hTpl: '1 · Platform template', hPrice: '2 · Price & costs', hFee: '3 · Platform fees', hAd: '4 · Ads & returns', hTarget: '5 · Target margin',
     advSum: 'Advanced: small-order fixed fee', saveTpl: 'Save as my template', delTpl: 'Delete this template',
     rProfit: 'Profit per unit', rMargin: 'Margin', rBE: 'Break-even price', rFees: 'Platform fees', saveSc: 'Save scenario', applyTarget: 'Use suggested price', detail: 'Details',
     disc: 'Disclaimer: platform fees, FX rates and rules change. Presets are for reference and results are estimates, not financial or tax advice. Check your platform dashboard and statements before pricing.',
     hScen: 'Saved scenarios', hCmp: 'Comparison', hBatch: 'Batch profit from CSV',
     batchDesc: 'Uses the platform template and fee settings currently selected on the Calculator tab. Columns missing from the CSV fall back to those settings.',
-    batchLocked: 'Batch import/export is a Pro feature.', dlSample: 'Download sample CSV', pickCsv: 'Choose CSV file', runPaste: 'Calculate pasted text', expCsv: 'Export results CSV',
+    dlSample: 'Download sample CSV', pickCsv: 'Choose CSV file', runPaste: 'Calculate pasted text', expCsv: 'Export results CSV',
     batchCols: 'Columns: name, price, ship_income, cost, ship_cost, other_cost, ad_pct, return_rate (%). Chinese headers also accepted.',
     hFx: 'Exchange rates (manual)', fxDesc: 'No built-in rates, so stale data cannot mislead you. Enter "1 unit of currency = how many CNY". Only used when cost currency differs from selling currency.',
     hSrc: 'Fee update dates & sources', srcDesc: '"Verified" = official page content was read on the check date. "Partly" = the official page could not be opened directly or relies on third-party reports. "Verify yourself" = no reliable source found; do not use the preset as is.',
-    foot: 'Data stays in this browser (localStorage) and is never uploaded. Clearing browser data erases it.',
-    proTitle: 'Unlock Pro', pro1: 'Batch-import many products via CSV and export results', pro2: 'Save multiple custom fee templates (free: 1)', pro3: 'Up to 200 saved scenarios, compare up to 8 (free: 10 / 3)',
-    proFree: 'The free version is fully usable: calculation, templates, saving and comparing scenarios.', licLabel: 'License key',
-    licNote: 'Local format check only — a placeholder. Payment and key issuing are not connected; the check can be bypassed and is not anti-piracy.',
-    licApply: 'Verify & unlock', licClear: 'Clear license', licBuy: 'Get a key (payments not live)', close: 'Close',
-    licOK: 'Key accepted. Pro unlocked on this device.', licBad: 'Invalid key. Check the format.', licCleared: 'License cleared.',
+    foot: 'Completely free, no limits. Data stays in this browser (localStorage) and is never uploaded. Clearing browser data erases it.',
     st_ok: 'Verified', st_part: 'Partly verified', st_none: 'Verify yourself', checked: 'Checked', src: 'Sources', modified: ' (modified)', myTpl: 'My templates',
     L_sellCur: 'Selling currency', L_costCur: 'Cost currency', L_price: 'Item price', L_shipIncome: 'Shipping charged to buyer', L_cost: 'Product cost', L_shipCost: 'Actual shipping / fulfilment', L_otherCost: 'Other costs (packaging, labor…)',
     L_commPct: 'Commission %', L_commOnShip: 'Commission base includes shipping', L_commFixed: 'Fixed commission per order', L_commMin: 'Minimum commission', L_payPct: 'Payment fee %', L_payFixed: 'Fixed payment fee per order', L_listing: 'Listing fee (per sale)',
@@ -154,12 +141,12 @@ var I18N = {
     wRate: function (a, b) { return 'Missing FX rate: enter ' + a + (b ? ' and ' + b : '') + ' to CNY under Rates & FX; costs cannot be converted.'; },
     wLoss: 'You lose money on each unit at these settings.', wFeeHigh: 'Percentages add up to ≥ 100%; no price can be profitable.',
     cnyLine: function (v) { return '≈ ' + v; },
-    scName: 'Name this scenario', scDefault: 'Scenario', scSaved: 'Scenario saved', scLimit: function (n) { return 'Free plan keeps up to ' + n + ' scenarios. Delete old ones or unlock Pro.'; },
+    scName: 'Name this scenario', scDefault: 'Scenario', scSaved: 'Scenario saved',
     scEmpty: 'No saved scenarios yet. Use "Save scenario" on the Calculator tab.', scLoad: 'Load', scDel: 'Delete', scSel: 'Compare',
-    cmpEmpty: 'Tick two or more scenarios to compare.', cmpMax: function (n) { return 'You can compare up to ' + n + ' at a time.'; },
+    cmpEmpty: 'Tick two or more scenarios to compare.',
     cRows: ['Template', 'Currency', 'Item price', 'Profit / unit', 'Margin', 'Break-even', 'Platform fees', 'Cost (converted)'], cBest: 'Best margin',
-    tplName: 'Name this template', tplSaved: 'Template saved', tplLimit: 'Free plan keeps 1 custom template. Delete the old one or unlock Pro.', tplDeleted: 'Deleted', tplNoDel: 'Built-in templates cannot be deleted.', tplEx: 'Built-in',
-    proNeed: 'This is a Pro feature.', csvEmpty: 'No rows to calculate.', csvDone: function (n) { return n + ' rows calculated'; }, csvCols: ['name', 'price', 'ship_income', 'cost', 'ship_cost', 'other_cost', 'ad_pct', 'return_rate', 'fees', 'profit', 'margin', 'break_even', 'suggested_price'],
+    tplName: 'Name this template', tplSaved: 'Template saved', tplDeleted: 'Deleted', tplNoDel: 'Built-in templates cannot be deleted.', tplEx: 'Built-in',
+    csvEmpty: 'No rows to calculate.', csvDone: function (n) { return n + ' rows calculated'; }, csvCols: ['name', 'price', 'ship_income', 'cost', 'ship_cost', 'other_cost', 'ad_pct', 'return_rate', 'fees', 'profit', 'margin', 'break_even', 'suggested_price'],
     fxRow: function (c) { return '1 ' + c + ' ='; }, fxUnit: 'CNY', fxFixed: 'base',
     sTplCols: ['Template', 'Status', 'Checked', 'Sources & notes'], unreach: 'unreachable'
   }
@@ -194,7 +181,7 @@ function defaultState() {
 
 /* ---------------- 存储 ---------------- */
 var KEY = 'pc.v1';
-var store = { lang: guessLang(), state: defaultState(), rates: {}, scenarios: [], myTpls: [], license: '' };
+var store = { lang: guessLang(), state: defaultState(), rates: {}, scenarios: [], myTpls: [] };
 function guessLang() { return /^zh/i.test(navigator.language || 'zh') ? 'zh' : 'en'; }
 function load() {
   try {
@@ -203,25 +190,11 @@ function load() {
       var o = JSON.parse(raw);
       store.lang = o.lang === 'en' ? 'en' : o.lang === 'zh' ? 'zh' : store.lang;
       store.state = Object.assign(defaultState(), o.state || {});
-      store.rates = o.rates || {}; store.scenarios = o.scenarios || []; store.myTpls = o.myTpls || []; store.license = o.license || '';
+      store.rates = o.rates || {}; store.scenarios = o.scenarios || []; store.myTpls = o.myTpls || [];
     }
   } catch (e) { /* 损坏的存档直接忽略 */ }
 }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) { toast('localStorage 不可用 / unavailable'); } }
-
-/* ---------------- 授权占位 ---------------- */
-var ALPHA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-function licSum(a, b) {
-  var h = 2166136261, s = 'PC1' + a + b;
-  for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
-  var out = ''; for (var j = 0; j < 4; j++) { out += ALPHA[h & 31]; h >>>= 5; }
-  return out;
-}
-function licValid(k) {
-  var m = /^PC1-([A-HJ-NP-Z2-9]{4})-([A-HJ-NP-Z2-9]{4})-([A-HJ-NP-Z2-9]{4})$/.exec((k || '').trim().toUpperCase());
-  return !!m && licSum(m[1], m[2]) === m[3];
-}
-function isPro() { return licValid(store.license); }
 
 /* ---------------- 计算核心 ---------------- */
 function num(v) { v = parseFloat(v); return isFinite(v) ? v : 0; }
@@ -398,7 +371,6 @@ function render() {
 
 /* ---------------- 情景与对比 ---------------- */
 var cmpSel = {};
-function limits() { return isPro() ? LIM.pro : LIM.free; }
 function snapshot(s) { return JSON.parse(JSON.stringify(s)); }
 function evalState(s) {
   var k = costK(s, store.rates), c = calc(s, s.price, k);
@@ -406,7 +378,7 @@ function evalState(s) {
 }
 function renderScenarios() {
   var t = T(), list = store.scenarios;
-  $('scCount').textContent = list.length + ' / ' + limits().sc;
+  $('scCount').textContent = String(list.length);
   if (!list.length) $('scList').innerHTML = '<p class="muted">' + t.scEmpty + '</p>';
   else $('scList').innerHTML = '<ul class="sc">' + list.map(function (x) {
     var e = evalState(x.s), tpl = getTpl(x.s.tpl);
@@ -467,7 +439,6 @@ function parseCSV(text) {
 }
 function runBatch(text) {
   var t = T();
-  if (!isPro()) { toast(t.proNeed); openPro(); return; }
   var rows = parseCSV(text);
   if (rows.length < 2) { toast(t.csvEmpty); return; }
   var head = rows[0].map(function (x) { var key = x.trim().replace(/[%％]$/, '').toLowerCase().replace(/\s+/g, '_'); return HEAD[key] || HEAD[x.trim()] || null; });
@@ -487,7 +458,6 @@ function runBatch(text) {
 }
 function renderBatch() {
   var t = T(), cur = store.state.sellCur;
-  $('batchLock').style.display = isPro() ? 'none' : '';
   if (!batchRows.length) { $('batchOut').innerHTML = ''; return; }
   var C = t.csvCols;
   var h = '<table class="cmp"><thead><tr>' + [C[0], C[1], C[3], C[8], C[9], C[10], C[11], C[12]].map(function (x) { return '<th>' + x + '</th>'; }).join('') + '</tr></thead><tbody>';
@@ -509,7 +479,6 @@ function download(name, text) {
 }
 function exportBatch() {
   var t = T();
-  if (!isPro()) { toast(t.proNeed); openPro(); return; }
   if (!batchRows.length) { toast(t.csvEmpty); return; }
   var C = t.csvCols, cur = store.state.sellCur;
   var out = [C.concat(['currency']).map(csvCell).join(',')];
@@ -519,21 +488,6 @@ function exportBatch() {
   download('profit-results.csv', out.join('\r\n'));
 }
 
-/* ---------------- Pro 对话框 ---------------- */
-function openPro() {
-  $('licIn').value = store.license; setLicMsg();
-  var d = $('proDlg'); if (d.showModal) d.showModal(); else d.setAttribute('open', '');
-}
-function setLicMsg(msg, bad) {
-  $('licMsg').textContent = msg || (isPro() ? T().licOK : ''); $('licMsg').className = 'licmsg' + (bad ? ' bad' : isPro() || msg ? ' good' : '');
-}
-function refreshPro() {
-  var b = $('proBtn'); b.classList.toggle('on', isPro());
-  b.firstElementChild.textContent = isPro() ? T().proOn : T().proBtn;
-  $('batchLock').style.display = isPro() ? 'none' : '';
-  $('batchCard').classList.toggle('locked', !isPro());
-}
-
 /* ---------------- 语言 ---------------- */
 function applyLang() {
   var t = T();
@@ -541,7 +495,7 @@ function applyLang() {
   document.querySelectorAll('[data-i18n]').forEach(function (el) { var v = t[el.dataset.i18n]; if (typeof v === 'string') el.innerHTML = v; });
   $('langBtn').textContent = store.lang === 'zh' ? 'EN' : '中';
   document.title = t.title + ' · ' + (store.lang === 'zh' ? 'Profit & Price Calculator' : '利润定价计算器');
-  buildForm(); render(); renderScenarios(); renderRates(); renderBatch(); refreshPro();
+  buildForm(); render(); renderScenarios(); renderRates(); renderBatch();
 }
 
 /* ---------------- 事件 ---------------- */
@@ -572,11 +526,9 @@ function init() {
   $('tpl').addEventListener('change', function () { applyTpl(this.value); });
   $('tabs').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) setTab(b.dataset.tab); });
   $('langBtn').addEventListener('click', function () { store.lang = store.lang === 'zh' ? 'en' : 'zh'; save(); applyLang(); });
-  $('proBtn').addEventListener('click', openPro);
   document.addEventListener('click', function (e) {
-    var t = T(), el = e.target.closest('[data-open-pro],[data-load],[data-del]');
+    var t = T(), el = e.target.closest('[data-load],[data-del]');
     if (!el) return;
-    if (el.hasAttribute('data-open-pro')) openPro();
     else if (el.dataset.load) {
       var x = store.scenarios.filter(function (y) { return y.id === el.dataset.load; })[0];
       if (x) { store.state = Object.assign(defaultState(), snapshot(x.s)); save(); syncForm(); $('tpl').value = store.state.tpl; render(); setTab('calc'); }
@@ -586,14 +538,12 @@ function init() {
   });
   document.addEventListener('change', function (e) {
     if (e.target.dataset && e.target.dataset.sc) {
-      var id = e.target.dataset.sc, n = Object.keys(cmpSel).filter(function (x) { return cmpSel[x]; }).length;
-      if (e.target.checked && n >= limits().cmp) { e.target.checked = false; toast(T().cmpMax(limits().cmp)); return; }
+      var id = e.target.dataset.sc;
       cmpSel[id] = e.target.checked; renderScenarios();
     }
   });
   $('saveSc').addEventListener('click', function () {
     var t = T();
-    if (store.scenarios.length >= limits().sc) { toast(t.scLimit(limits().sc)); if (!isPro()) openPro(); return; }
     var def = t.scDefault + ' ' + (store.scenarios.length + 1);
     var name = window.prompt(t.scName, def); if (name === null) return;
     store.scenarios.unshift({ id: 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name: (name.trim() || def).slice(0, 40), s: snapshot(store.state), at: Date.now() });
@@ -604,7 +554,6 @@ function init() {
   });
   $('saveTpl').addEventListener('click', function () {
     var t = T();
-    if (store.myTpls.length >= limits().tpl) { toast(t.tplLimit); if (!isPro()) openPro(); return; }
     var name = window.prompt(t.tplName, ''); if (!name || !name.trim()) return;
     var s = store.state, f = {}; FEE_KEYS.forEach(function (k) { f[k] = s[k]; });
     var id = 'my-' + Date.now().toString(36);
@@ -621,27 +570,17 @@ function init() {
   // batch
   $('csvFile').addEventListener('change', function () {
     var f = this.files[0]; if (!f) return;
-    if (!isPro()) { toast(T().proNeed); openPro(); this.value = ''; return; }
     var r = new FileReader(); r.onload = function () { $('csvText').value = r.result; runBatch(r.result); }; r.readAsText(f); this.value = '';
   });
-  $('csvFile').addEventListener('click', function (e) { if (!isPro()) { e.preventDefault(); toast(T().proNeed); openPro(); } });
   $('runPaste').addEventListener('click', function () { runBatch($('csvText').value); });
   $('expCsv').addEventListener('click', exportBatch);
   $('dlSample').addEventListener('click', function () {
     download('sample-products.csv', 'name,price,ship_income,cost,ship_cost,other_cost,ad_pct,return_rate\r\nMug 马克杯,24,0,6.5,4,0.8,8,3\r\nTote bag,32,5,9,4.5,1,10,5\r\nPrint A3,18,3,2.2,2.5,0.5,12,2\r\n');
   });
-  // pro dialog
-  $('licOk').addEventListener('click', function () {
-    var v = $('licIn').value.trim().toUpperCase();
-    if (licValid(v)) { store.license = v; save(); setLicMsg(T().licOK); refreshPro(); renderScenarios(); }
-    else setLicMsg(T().licBad, true);
-  });
-  $('licClear').addEventListener('click', function () { store.license = ''; $('licIn').value = ''; save(); setLicMsg(T().licCleared); refreshPro(); renderScenarios(); });
-  $('proDlg').addEventListener('click', function (e) { if (e.target === this) this.close(); });
   if (!getTpl(store.state.tpl)) store.state.tpl = 'etsy-us';
   applyLang();
 }
 
-window.PC = { calc: calc, solve: solve, costK: costK, TPLS: TPLS, licSum: licSum, licValid: licValid, parseCSV: parseCSV, defaultState: defaultState, store: function () { return store; } };
+window.PC = { calc: calc, solve: solve, costK: costK, TPLS: TPLS, parseCSV: parseCSV, defaultState: defaultState, store: function () { return store; } };
 init();
 })();

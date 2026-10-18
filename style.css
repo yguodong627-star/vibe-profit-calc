@@ -27,10 +27,6 @@ a{color:#0b5a7a}
 .top-r{margin-left:auto;display:flex;gap:8px}
 .chip{background:#2c353a;border:1px solid #3a454b;color:#e8e4da;border-radius:6px;font:inherit;font-size:13px;padding:6px 11px;cursor:pointer}
 .chip:hover{border-color:#5a666d}
-.pro-btn{background:var(--amber);border-color:var(--amber);color:#2a1c00;font-weight:600}
-.pro-btn.on{background:#2c353a;border-color:var(--amber);color:var(--amber)}
-.pro-tag{font-style:normal;font-size:10px;font-weight:700;letter-spacing:.06em;background:var(--amber);color:#2a1c00;padding:1px 5px;border-radius:3px;vertical-align:1px;margin-left:3px}
-.pro-tag.big{font-size:12px;padding:3px 8px}
 
 /* 布局 */
 main.wrap{padding-top:20px}
@@ -51,11 +47,9 @@ body{overflow-x:hidden}
 .fld.chk{display:flex;flex-direction:column;justify-content:flex-end}
 .fld.chk label{display:flex;gap:8px;align-items:center;margin:0;padding:9px 0}
 .inp{display:flex;align-items:stretch;border:1px solid var(--line);border-radius:7px;background:#fff;overflow:hidden}
-.inp:focus-within,select:focus,textarea:focus,#licIn:focus{border-color:var(--ink);box-shadow:0 0 0 2px rgba(232,163,61,.45);outline:0}
-.inp input{border:0;outline:0;flex:1;min-width:0;padding:9px 10px;font:inherit;font-family:var(--mono);font-size:15px;background:transparent;color:var(--ink)}
+.inp:focus-within,select:focus,textarea:focus,.inp input{border:0;outline:0;flex:1;min-width:0;padding:9px 10px;font:inherit;font-family:var(--mono);font-size:15px;background:transparent;color:var(--ink)}
 .unit{padding:0 10px;display:flex;align-items:center;background:#f6f4ee;border-left:1px solid var(--line2);font-size:12px;color:var(--ink2);font-family:var(--mono)}
-select,textarea,#licIn{width:100%;border:1px solid var(--line);border-radius:7px;padding:9px 10px;font:inherit;background:#fff;color:var(--ink)}
-textarea{font-family:var(--mono);font-size:13px;margin-top:10px;resize:vertical}
+select,textarea,textarea{font-family:var(--mono);font-size:13px;margin-top:10px;resize:vertical}
 input[type=checkbox]{width:18px;height:18px;accent-color:var(--ink)}
 .adv{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
 .adv summary{cursor:pointer;color:var(--ink2);font-size:13px;margin-bottom:10px}
@@ -115,18 +109,8 @@ table{border-collapse:collapse;width:100%}
 .cmp td.txt{font-family:var(--sans);white-space:normal;text-align:right}
 .best{display:block;font-size:10.5px;font-weight:600;color:var(--pos);margin-top:2px}
 .src td{line-height:1.5}.nw{white-space:nowrap}
-.card.locked #csvText{opacity:.7}
-.lock{background:#fff6e2;border:1px solid #efd29b;border-radius:8px;padding:10px 12px;margin:8px 0;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:14px}
 .fx{grid-template-columns:repeat(3,minmax(0,1fr))}
 
-/* Pro 弹窗 */
-dialog{border:0;border-radius:12px;padding:0;max-width:460px;width:calc(100% - 28px);box-shadow:0 20px 60px rgba(0,0,0,.3);color:var(--ink)}
-dialog::backdrop{background:rgba(20,26,29,.55)}
-.dlg{padding:22px}.dlg h3{margin:0 0 10px;font-size:19px}
-.pro-list{padding-left:18px;margin:0 0 10px}.pro-list li{margin:4px 0}
-.dlg .row{flex-wrap:wrap}
-#licIn{font-family:var(--mono);letter-spacing:.06em;margin:4px 0 6px}
-.licmsg{min-height:20px;font-size:13px}.licmsg.good{color:var(--pos)}.licmsg.bad{color:var(--neg)}
 
 /* 底部 */
 .foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12.5px;color:var(--ink2);padding-top:14px;padding-bottom:20px;border-top:1px solid var(--line);margin-top:10px}

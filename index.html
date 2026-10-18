@@ -19,12 +19,11 @@
     <nav class="tabs" id="tabs" role="tablist">
       <button role="tab" data-tab="calc" class="on" data-i18n="tabCalc">计算</button>
       <button role="tab" data-tab="compare" data-i18n="tabCompare">情景对比</button>
-      <button role="tab" data-tab="batch" data-i18n="tabBatch">批量 <i class="pro-tag">Pro</i></button>
+      <button role="tab" data-tab="batch" data-i18n="tabBatch">批量</button>
       <button role="tab" data-tab="rates" data-i18n="tabRates">费率与汇率</button>
     </nav>
     <div class="top-r">
       <button class="chip" id="langBtn" title="中文 / English">EN</button>
-      <button class="chip pro-btn" id="proBtn"><span data-i18n="proBtn">Pro 解锁</span></button>
     </div>
   </div>
 </header>
@@ -113,9 +112,8 @@
 <!-- ============ 批量 ============ -->
 <section id="tab-batch" class="pane">
   <div class="card" id="batchCard">
-    <div class="card-h"><h2 data-i18n="hBatch">CSV 批量算利润</h2><span class="pro-tag big">Pro</span></div>
+    <div class="card-h"><h2 data-i18n="hBatch">CSV 批量算利润</h2></div>
     <p class="muted" data-i18n="batchDesc">按“计算”页当前选中的平台模板与费用设置，对每一行商品算利润。CSV 里没写的列用当前设置。</p>
-    <div class="lock" id="batchLock"><span data-i18n="batchLocked">批量导入与导出是 Pro 功能。</span> <button class="btn sm" data-open-pro data-i18n="proBtn">Pro 解锁</button></div>
     <div class="row gap wrap-r">
       <button class="btn sm ghost" id="dlSample" data-i18n="dlSample">下载示例 CSV</button>
       <label class="btn sm" for="csvFile" data-i18n="pickCsv">选择 CSV 文件</label>
@@ -151,28 +149,6 @@
   <span class="muted small">v1.0 · 2026-10-18</span>
 </footer>
 
-<!-- Pro dialog -->
-<dialog id="proDlg">
-  <form method="dialog" class="dlg">
-    <h3 data-i18n="proTitle">Pro 解锁</h3>
-    <ul class="pro-list">
-      <li data-i18n="pro1">CSV 批量导入多个商品，一次算完并导出结果</li>
-      <li data-i18n="pro2">保存多个自定义费率模板（免费版 1 个）</li>
-      <li data-i18n="pro3">情景保存上限 200 个，对比最多 8 个（免费 10 个 / 3 个）</li>
-    </ul>
-    <p class="muted small" data-i18n="proFree">免费版的计算、模板、情景保存与对比都是完整可用的。</p>
-    <label class="lab" for="licIn" data-i18n="licLabel">授权码</label>
-    <input id="licIn" type="text" placeholder="PC1-XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false">
-    <div id="licMsg" class="licmsg"></div>
-    <p class="muted small" data-i18n="licNote">当前只做本地格式校验，是占位实现，尚未接入收款与发码；校验可被绕过，不具备防盗版能力。</p>
-    <div class="row gap">
-      <button class="btn" id="licOk" value="x" type="button" data-i18n="licApply">验证并解锁</button>
-      <button class="btn ghost" id="licClear" type="button" data-i18n="licClear">清除授权</button>
-      <button class="btn ghost" id="licBuy" type="button" disabled data-i18n="licBuy">获取授权（收款未开通）</button>
-      <button class="btn ghost" value="close" data-i18n="close">关闭</button>
-    </div>
-  </form>
-</dialog>
 <div id="toast" class="toast" role="status"></div>
 <script src="app.js"></script>
 </body>
